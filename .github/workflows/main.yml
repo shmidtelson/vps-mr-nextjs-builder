@@ -2,7 +2,7 @@ name: PR Deployment
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, closed] # Trigger on PR open, sync, and close
 
 jobs:
   deploy:
@@ -51,5 +51,6 @@ jobs:
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "npm install -g pm2 && pm2 start npm --name 'your-nextjs-app-${{ github.event.number }}' -- start -- -p $((3000 + ${{ github.event.number }}))"
 
       - name: Cleanup on VPS
+        if: ${{ github.event_name == 'closed' }} # Run only when PR is closed
         run: |
-          # Clean up any temporary files or resources on VPS
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "rm -rf /home/frontend/${{ env.SUBDOMAIN }}" # Delete folder on server
