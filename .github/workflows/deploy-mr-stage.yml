@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ inputs.environment }}
+      name: 'stage'
       # redirect to https://www.{{ env.BUCKET }}
       url: https://${{ github.event.number }}-${{ github.head_ref }}.test.com
     steps:
