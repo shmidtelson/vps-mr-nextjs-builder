@@ -2,14 +2,12 @@ name: PR Deployment
 
 on:
   pull_request:
-    types: [ opened, synchronize, closed ] # Trigger on PR open, sync, and close
-  push:
-    branches:
-      - '*'
+    types: [ opened, synchronize ] # Trigger on PR open, sync, and close
+
 
 jobs:
   deploy:
-    if: github.event_name == 'opened' || github.event_name == 'synchronize' || github.event_name == 'push'
+    if: github.event_name == 'opened' || github.event_name == 'synchronize'
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
@@ -53,11 +51,3 @@ jobs:
 #      - name: Start Next.js app with PM2 on VPS
 #        run: |
 #          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "npm install -g pm2 && pm2 start npm --name 'your-nextjs-app-${{ github.event.number }}' -- start -- -p $((3000 + ${{ github.event.number }}))"
-
-  cleanup_on_close:
-    if: github.event_name == 'closed'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cleanup on VPS
-        run: |
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "rm -rf /home/frontend/${{ github.event.number }}-${{ github.head_ref }}"
