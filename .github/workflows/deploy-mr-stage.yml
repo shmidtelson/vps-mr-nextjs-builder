@@ -54,12 +54,19 @@ jobs:
           source: "." # Source directory or file path
           target: "/home/frontend/${{ env.SUBDOMAIN }}" # Dynamic subdomain directory on VPS
 
-      - name: Start Next.js app with PM2 on VPS
-        run: |
-          pm2 start npm --name 'stage-nextjs-app-${{ github.event.number }}' -- start
-          # Extract the port number from PM2
-          NEXTJS_APP_PORT=$(pm2 show stage-nextjs-app-${{ github.event.number }} | grep "Listen Address" | awk -F':' '{print $NF}' | tr -d ' ')
-          echo "NEXTJS_APP_PORT=$NEXTJS_APP_PORT" >> $GITHUB_ENV
+      - name: SSH to VPS and Start Next.js app with PM2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /home/frontend/${{ env.SUBDOMAIN }}
+            pm2 start npm --name 'stage-nextjs-app-${{ github.event.number }}' -- start
+            # Extract the port number from PM2
+            NEXTJS_APP_PORT=$(pm2 show stage-nextjs-app-${{ github.event.number }} | grep "Listen Address" | awk -F':' '{print $NF}' | tr -d ' ')
+            echo "NEXTJS_APP_PORT=$NEXTJS_APP_PORT" >> $GITHUB_ENV
 
       - name: Configure Nginx on VPS
         run: |
