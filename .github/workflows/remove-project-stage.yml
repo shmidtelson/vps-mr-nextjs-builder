@@ -5,9 +5,18 @@ on:
     types: [ closed ] # Trigger on PR open, sync, and close
 
 jobs:
-  cleanup_on_close:
+  set_env:
     runs-on: ubuntu-latest
     steps:
+      - name: Set Domain Secret
+        run: echo "DOMAIN_ADDRESS=${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
+
+  cleanup_on_close:
+    runs-on: ubuntu-latest
+    env:
+      SUBDOMAIN: "${{ github.event.number }}-${{ github.head_ref }}"
+    steps:
+
       - name: Cleanup on VPS
         run: |
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "rm -rf /home/frontend/${{ github.event.number }}-${{ github.head_ref }}"
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "rm -rf /home/frontend/${{ env.SUBDOMAIN }}"

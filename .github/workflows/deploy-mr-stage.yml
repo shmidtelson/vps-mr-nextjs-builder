@@ -6,12 +6,19 @@ on:
 
 
 jobs:
+  set_env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Domain Secret
+        run: echo "DOMAIN_ADDRESS=${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
+
   deploy:
     runs-on: ubuntu-latest
+    env:
+      SUBDOMAIN: "${{ github.event.number }}-${{ github.head_ref }}"
     environment:
       name: 'stage'
-      # redirect to https://www.{{ env.BUCKET }}
-      url: "https://${{ github.event.number }}-${{ github.head_ref }}.${{ secrets.DOMAIN_ADDRESS }}"
+      url: "https://${{ github.event.number }}-${{ github.head_ref }}.${{ env.DOMAIN_ADDRESS }}"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -33,11 +40,6 @@ jobs:
         run: |
           npm install
           npm run build
-
-      - name: Set Subdomain
-        id: subdomain
-        run: |
-          echo "SUBDOMAIN=${{ github.event.number }}-${{ github.head_ref }}" >> $GITHUB_ENV
 
       - name: Copy project files to VPS
         uses: appleboy/scp-action@master
