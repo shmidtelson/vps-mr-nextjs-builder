@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [ opened, synchronize ] # Trigger on PR open, sync, and close
   workflow_run:
-    workflows: ["PR Deployment"]
+    workflows: ["Remove deploy"]
     types:
       - completed
 
