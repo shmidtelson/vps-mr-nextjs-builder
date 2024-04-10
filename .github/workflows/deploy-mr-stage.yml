@@ -63,10 +63,27 @@ jobs:
 
       - name: Configure Nginx on VPS
         run: |
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo cp /path/to/nginx/config /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }} /etc/nginx/sites-enabled/"
+          # Remove existing NGINX config file
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
+          # Create new NGINX config file
+          cat << EOF | sudo tee /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}
+          server {
+              listen 443 ssl;
+              server_name ${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }};
+              ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+              ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+              location / {
+                  proxy_pass http://localhost:${{ env.NEXTJS_APP_PORT }}; # Adjust this to match the port provided by PM2
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $host;
+                  proxy_cache_bypass $http_upgrade;
+              }
+          }
+          EOF
+          # Enable NGINX config
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
+          # Restart NGINX
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
-
-#      - name: Start Next.js app with PM2 on VPS
-#        run: |
-#          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "npm install -g pm2 && pm2 start npm --name 'your-nextjs-app-${{ github.event.number }}' -- start -- -p $((3000 + ${{ github.event.number }}))"
