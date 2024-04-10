@@ -1,0 +1,60 @@
+name: PR Deployment
+
+on:
+  pull_request:
+    types: [ opened, synchronize ] # Trigger on PR open, sync, and close
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: 'stage'
+      # redirect to https://www.{{ env.BUCKET }}
+      url: "https://${{ github.event.number }}-${{ github.head_ref }}.${{ secrets.DOMAIN_ADDRESS }}"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+
+      - name: Set Subdomain
+        id: subdomain
+        run: |
+          echo "SUBDOMAIN=${{ github.event.number }}-${{ github.head_ref }}" >> $GITHUB_ENV
+
+      - name: Copy project files to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }} # Optional, default is 22
+          source: "." # Source directory or file path
+          target: "/home/frontend/${{ env.SUBDOMAIN }}" # Dynamic subdomain directory on VPS
+
+#      - name: Configure Nginx on VPS
+#        run: |
+#          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo cp /path/to/nginx/config /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
+#          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }} /etc/nginx/sites-enabled/"
+#          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
+#
+#      - name: Start Next.js app with PM2 on VPS
+#        run: |
+#          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "npm install -g pm2 && pm2 start npm --name 'your-nextjs-app-${{ github.event.number }}' -- start -- -p $((3000 + ${{ github.event.number }}))"
