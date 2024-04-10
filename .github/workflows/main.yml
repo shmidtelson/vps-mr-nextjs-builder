@@ -30,7 +30,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }} # Optional, default is 22
           source: "." # Source directory or file path
-          target: "/path/to/webserver" # Destination directory on VPS
+          target: "/home/frontend" # Destination directory on VPS
 
       - name: Configure Nginx on VPS
         run: |
