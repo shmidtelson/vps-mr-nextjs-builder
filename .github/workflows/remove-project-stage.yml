@@ -8,6 +8,11 @@ jobs:
   cleanup_on_close:
     runs-on: ubuntu-latest
     steps:
+      - name: Set Subdomain
+        id: subdomain
+        run: |
+          echo "SUBDOMAIN=${{ github.event.number }}-${{ github.head_ref }}" >> $GITHUB_ENV
+
       - name: Cleanup on VPS
         run: |
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "rm -rf /home/frontend/${{ github.event.number }}-${{ github.head_ref }}"
