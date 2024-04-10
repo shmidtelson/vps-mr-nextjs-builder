@@ -3,6 +3,10 @@ name: PR Deployment
 on:
   pull_request:
     types: [ closed ] # Trigger on PR open, sync, and close
+  workflow_run:
+    workflows: ["Deploy"]
+    types:
+      - completed
 
 jobs:
   set_env:
@@ -16,7 +20,18 @@ jobs:
     env:
       SUBDOMAIN: "${{ github.event.number }}-${{ github.head_ref }}"
     steps:
+      - name: Remove NGINX configuration file
+        run: |
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
+
+      - name: Restart NGINX
+        run: |
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo systemctl restart nginx"
 
       - name: Cleanup on VPS
         run: |
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "rm -rf /home/frontend/${{ env.SUBDOMAIN }}"
+
+      - name: Stop PM2 process
+        run: |
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "pm2 delete stage-nextjs-app-${{ github.event.number }}"

@@ -3,7 +3,10 @@ name: PR Deployment
 on:
   pull_request:
     types: [ opened, synchronize ] # Trigger on PR open, sync, and close
-
+  workflow_run:
+    workflows: ["Remove deploy", "Deploy"]
+    types:
+      - completed
 
 jobs:
   set_env:
@@ -51,12 +54,19 @@ jobs:
           source: "." # Source directory or file path
           target: "/home/frontend/${{ env.SUBDOMAIN }}" # Dynamic subdomain directory on VPS
 
-#      - name: Configure Nginx on VPS
-#        run: |
-#          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo cp /path/to/nginx/config /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
-#          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }} /etc/nginx/sites-enabled/"
-#          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
-#
+      - name: Start Next.js app with PM2 on VPS
+        run: |
+          pm2 start npm --name 'stage-nextjs-app-${{ github.event.number }}' -- start
+          # Extract the port number from PM2
+          NEXTJS_APP_PORT=$(pm2 show stage-nextjs-app-${{ github.event.number }} | grep "Listen Address" | awk -F':' '{print $NF}' | tr -d ' ')
+          echo "NEXTJS_APP_PORT=$NEXTJS_APP_PORT" >> $GITHUB_ENV
+
+      - name: Configure Nginx on VPS
+        run: |
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo cp /path/to/nginx/config /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }} /etc/nginx/sites-enabled/"
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
+
 #      - name: Start Next.js app with PM2 on VPS
 #        run: |
 #          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "npm install -g pm2 && pm2 start npm --name 'your-nextjs-app-${{ github.event.number }}' -- start -- -p $((3000 + ${{ github.event.number }}))"
