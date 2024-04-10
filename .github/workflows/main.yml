@@ -42,10 +42,6 @@ jobs:
         run: |
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "npm install -g pm2 && pm2 start npm --name 'your-nextjs-app-${{ github.event.number }}' -- start -- -p $((3000 + ${{ github.event.number }}))"
 
-      - name: Install Certbot on VPS
-        run: |
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo apt update && sudo apt install -y certbot python3-certbot-nginx"
-
       - name: Cleanup on VPS
         run: |
           # Clean up any temporary files or resources on VPS
