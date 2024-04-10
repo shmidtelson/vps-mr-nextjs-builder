@@ -18,7 +18,6 @@ jobs:
       SUBDOMAIN: "${{ github.event.number }}-${{ github.head_ref }}"
     environment:
       name: 'stage'
-      # redirect to https://www.{{ env.BUCKET }}
       url: "https://${{ github.event.number }}-${{ github.head_ref }}.${{ env.DOMAIN_ADDRESS }}"
     steps:
       - name: Checkout code
