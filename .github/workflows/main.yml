@@ -10,7 +10,7 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
       # redirect to https://www.{{ env.BUCKET }}
-      url: https://${{ github.event.number }}-${{ github.head_ref }}.${{ secrets.DOMAIN_ADDRESS }}
+      url: https://${{ github.event.number }}-${{ github.head_ref }}.test.com
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
