@@ -2,10 +2,14 @@ name: PR Deployment
 
 on:
   pull_request:
+    types: [ opened, synchronize, closed ] # Trigger on PR open, sync, and close
+  push:
+    branches:
+      - '*'
 
 jobs:
   deploy:
-    if: github.event_name == 'opened' || github.event_name == 'synchronize'
+    if: github.event_name == 'opened' || github.event_name == 'synchronize' || github.event_name == 'push'
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
