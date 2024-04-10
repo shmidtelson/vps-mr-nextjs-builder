@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUBDOMAIN: "${{ github.event.number }}-${{ github.head_ref }}"
+      PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
     environment:
       name: 'stage'
       url: "https://${{ github.event.number }}-${{ github.head_ref }}.${{ env.DOMAIN_ADDRESS }}"
@@ -63,9 +64,9 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/frontend/${{ env.SUBDOMAIN }}
-            pm2 start npm --name 'stage-nextjs-app-${{ github.event.number }}' -- start
+            ${{ env.PATH_PM2 }} start npm --name 'stage-nextjs-app-${{ github.event.number }}' -- start
             # Extract the port number from PM2
-            NEXTJS_APP_PORT=$(pm2 show stage-nextjs-app-${{ github.event.number }} | grep "Listen Address" | awk -F':' '{print $NF}' | tr -d ' ')
+            NEXTJS_APP_PORT=$(${{ env.PATH_PM2 }} show stage-nextjs-app-${{ github.event.number }} | grep "Listen Address" | awk -F':' '{print $NF}' | tr -d ' ')
             echo "NEXTJS_APP_PORT=$NEXTJS_APP_PORT" >> $GITHUB_ENV
 
       - name: Configure Nginx on VPS

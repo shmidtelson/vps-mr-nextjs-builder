@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUBDOMAIN: "${{ github.event.number }}-${{ github.head_ref }}"
+      PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
     steps:
       - name: Remove NGINX configuration file
         run: |
@@ -34,4 +35,4 @@ jobs:
 
       - name: Stop PM2 process
         run: |
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "pm2 delete stage-nextjs-app-${{ github.event.number }}"
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "${{ env.PATH_PM2 }} delete stage-nextjs-app-${{ github.event.number }}"
