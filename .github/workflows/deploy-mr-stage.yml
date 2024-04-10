@@ -11,7 +11,7 @@ jobs:
     environment:
       name: 'stage'
       # redirect to https://www.{{ env.BUCKET }}
-      url: https://${{ github.event.number }}-${{ github.head_ref }}.test.com
+      url: "https://${{ github.event.number }}-${{ github.head_ref }}.${{ secrets.DOMAIN_ADDRESS }}"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
