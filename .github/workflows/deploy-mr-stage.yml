@@ -39,6 +39,7 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > /tmp/ssh_key.pem
           chmod 600 /tmp/ssh_key.pem
+          cat /tmp/ssh_key.pem
 
       - name: Cache node modules
         uses: actions/cache@v2
@@ -81,7 +82,7 @@ jobs:
 
       - name: Configure Nginx on VPS
         run: |
-          echo $SUBDOMAIN
+          cat /tmp/ssh_key.pem
           # Remove existing NGINX config file
           ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}"
           ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
