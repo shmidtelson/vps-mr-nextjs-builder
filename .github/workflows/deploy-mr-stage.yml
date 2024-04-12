@@ -35,6 +35,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Save ssh key
+        run: |
+          echo "$SSH_PRIVATE_KEY" > ssh_key.pem
+          chmod 600 /tmp/ssh_key.pem
+
       - name: Cache node modules
         uses: actions/cache@v2
         with:
@@ -78,8 +83,8 @@ jobs:
         run: |
           echo $SUBDOMAIN
           # Remove existing NGINX config file
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}"
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
+          ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}"
+          ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
           # Create new NGINX config file
           cat << EOF | sudo tee /etc/nginx/sites-available/${{ env.SUBDOMAIN }}
           server {
@@ -98,6 +103,6 @@ jobs:
           }
           EOF
           # Enable NGINX config
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
+          ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
           # Restart NGINX
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
+          ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
