@@ -17,7 +17,7 @@ jobs:
       PORT_NUMBER: $((10000 + RANDOM % 10001))
     environment:
       name: 'stage'
-      url: "https://${{ github.sha }}.${{ secrets.DOMAIN_ADDRESS }}"
+      url: https://${{ github.sha }}.${{ secrets.DOMAIN_ADDRESS }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
