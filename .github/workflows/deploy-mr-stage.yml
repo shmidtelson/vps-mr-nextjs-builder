@@ -20,6 +20,9 @@ jobs:
         run: echo "URL=https://$SUBDOMAIN" >> $GITHUB_ENV
       - name: Output URL
         run: echo "URL is $URL"
+      - name: Print Envs
+        run: printenv
+
   deploy:
     runs-on: ubuntu-latest
     needs: [set_env]
