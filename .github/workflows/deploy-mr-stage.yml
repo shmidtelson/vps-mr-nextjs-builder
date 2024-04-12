@@ -20,6 +20,7 @@ jobs:
     env:
       SUBDOMAIN: "${{ github.event.number }}-${{ github.head_ref }}"
       PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
+      PORT_NUMBER: $((10000 + RANDOM % 10001))
     environment:
       name: 'stage'
       url: "https://${{ github.event.number }}-${{ github.head_ref }}.${{ env.DOMAIN_ADDRESS }}"
@@ -64,10 +65,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/frontend/${{ env.SUBDOMAIN }}
-            ${{ env.PATH_PM2 }} start npm --name 'stage-nextjs-app-${{ github.event.number }}' -- start
-            # Extract the port number from PM2
-            NEXTJS_APP_PORT=$(${{ env.PATH_PM2 }} show stage-nextjs-app-${{ github.event.number }} | grep "Listen Address" | awk -F':' '{print $NF}' | tr -d ' ')
-            echo "NEXTJS_APP_PORT=$NEXTJS_APP_PORT" >> $GITHUB_ENV
+            ${{ env.PATH_PM2 }} start npm --name 'stage-nextjs-app-${{ github.event.number }}' -- start -- --port $PORT_NUMBER
 
       - name: Configure Nginx on VPS
         run: |
@@ -82,7 +80,7 @@ jobs:
               ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
               ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
               location / {
-                  proxy_pass http://localhost:${{ env.NEXTJS_APP_PORT }}; # Adjust this to match the port provided by PM2
+                  proxy_pass http://localhost:${{ env.PORT_NUMBER }}; # Adjust this to match the port provided by PM2
                   proxy_http_version 1.1;
                   proxy_set_header Upgrade $http_upgrade;
                   proxy_set_header Connection 'upgrade';
