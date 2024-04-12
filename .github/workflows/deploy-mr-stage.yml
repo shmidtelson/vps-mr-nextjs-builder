@@ -39,15 +39,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18'
-
-      - name: Install dependencies and build
-        run: |
-          npm install
-          npm run build
+#      - name: Install Node.js
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: '18'
+#
+#      - name: Install dependencies and build
+#        run: |
+#          npm install
+#          npm run build
 
       - name: Copy project files to VPS
         uses: appleboy/scp-action@master
