@@ -81,7 +81,7 @@ jobs:
               listen 443 ssl;
               server_name ${{ env.SUBDOMAIN_ADDRESS }};
               ssl_certificate /etc/ssl/certs/server.pem;
-              ssl_certificate_key /etc/ssl/private/server.key;
+              ssl_certificate_key /etc/ssl/certs/server.key;
               location / {
                 proxy_pass http://localhost:$PORT_NUMBER; # Adjust this to match the port provided by PM2
                 proxy_http_version 1.1;
