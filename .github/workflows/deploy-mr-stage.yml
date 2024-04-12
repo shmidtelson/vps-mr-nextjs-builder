@@ -17,7 +17,7 @@ jobs:
       NPM: /root/.nvm/versions/node/v18.20.2/bin/npm
       PORT_NUMBER: $((10000 + RANDOM % 10001))
       DOMAIN_ADDRESS: web7.pro
-      SUBDOMAIN_ADDRESS: $GITHUB_SHA.${{ env.DOMAIN_ADDRESS }}
+      SUBDOMAIN_ADDRESS: $GITHUB_SHA.web7.pro
     environment:
       name: 'stage'
       url: https://$DOMAIN_ADDRESS
