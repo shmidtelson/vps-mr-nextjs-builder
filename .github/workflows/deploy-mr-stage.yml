@@ -37,7 +37,7 @@ jobs:
 
       - name: Save ssh key
         run: |
-          echo "$SSH_PRIVATE_KEY" > ssh_key.pem
+          echo "$SSH_PRIVATE_KEY" > /tmp/ssh_key.pem
           chmod 600 /tmp/ssh_key.pem
 
       - name: Cache node modules
