@@ -52,7 +52,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }} # Optional, default is 22
           source: "." # Source directory or file path
-          target: "/home/frontend/${{ github.sha }}" # Dynamic subdomain directory on VPS
+          target: "/home/frontend/${{ env.SUBDOMAIN_ADDRESS }}" # Dynamic subdomain directory on VPS
 
       - name: SSH to VPS and Start Next.js app with PM2
         uses: appleboy/ssh-action@master
