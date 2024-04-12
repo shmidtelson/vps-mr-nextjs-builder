@@ -3,26 +3,22 @@ name: PR Deployment to VPS
 on:
   pull_request:
     types: [ opened, synchronize ] # Trigger on PR open, sync, and close
+  workflow_run:
+    workflows: ["Remove deploy", "Deploy"]
+    types:
+      - completed
 
 jobs:
-  set_env:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set Domain Secret
-        run: echo "DOMAIN_ADDRESS=${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
-      - name: Set Head Ref
-        run: echo "HEAD_REF_NEW=$(echo $GITHUB_HEAD_REF | tr '/' '-')" >> $GITHUB_ENV
-
   deploy:
     runs-on: ubuntu-latest
     needs: [set_env]
     env:
-      SUBDOMAIN: "${{ github.event.number }}-${{ env.HEAD_REF_NEW }}"
+      SUBDOMAIN: ${{ github.event.number }}-$(echo $GITHUB_HEAD_REF | tr '/' '-')
       PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
       PORT_NUMBER: $((10000 + RANDOM % 10001))
     environment:
       name: 'stage'
-      url: "https://${{ env.SUBDOMAIN }}.${{ env.DOMAIN_ADDRESS }}"
+      url: "https://${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
