@@ -78,8 +78,8 @@ jobs:
             server {
               listen 443 ssl;
               server_name ${{ env.SUBDOMAIN_ADDRESS }};
-              ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
-              ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+              ssl_certificate /etc/ssl/certs/server.crt;
+              ssl_certificate_key /etc/ssl/private/server.key;
               location / {
                 proxy_pass http://localhost:${{ env.PORT_NUMBER }}; # Adjust this to match the port provided by PM2
                 proxy_http_version 1.1;
