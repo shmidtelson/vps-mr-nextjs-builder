@@ -8,19 +8,12 @@ on:
     types:
       - completed
 
-jobs:
-  set_env:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set Domain Secret
-        run: echo "DOMAIN_ADDRESS=${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
-      - name: Set Subdomain
-        run: echo "SUBDOMAIN=$GITHUB_SHA.${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
-      - name: Set URL
-        run: echo "URL=https://$SUBDOMAIN" >> $GITHUB_ENV
-      - name: Output URL
-        run: echo "URL is $URL"
+env:
+  DOMAIN_ADDRESS: ${{ secrets.DOMAIN_ADDRESS }}
+  SUBDOMAIN: $GITHUB_SHA.${{ secrets.DOMAIN_ADDRESS }}
+  URL: https://$SUBDOMAIN
 
+jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [set_env]
@@ -28,7 +21,6 @@ jobs:
       PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
       NPM: /root/.nvm/versions/node/v18.20.2/bin/npm
       PORT_NUMBER: $((10000 + RANDOM % 10001))
-      SUBDOMAIN: $SUBDOMAIN
     environment:
       name: 'stage'
       url: ${{ env.URL }}
@@ -76,7 +68,7 @@ jobs:
 #            ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.sha }}' -- start -- --port ${{ env.PORT_NUMBER }}
 
       - name: Configure Nginx on VPS
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
