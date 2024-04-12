@@ -76,6 +76,7 @@ jobs:
 
       - name: Configure Nginx on VPS
         run: |
+          echo $SUBDOMAIN
           # Remove existing NGINX config file
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}"
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
