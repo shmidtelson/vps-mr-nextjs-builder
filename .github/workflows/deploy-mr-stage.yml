@@ -71,8 +71,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            DOMAIN_ADDRESS="${DOMAIN_ADDRESS}"  # Ensure DOMAIN_ADDRESS is properly set
-            SUBDOMAIN_ADDRESS="${SUBDOMAIN_ADDRESS}"  # Ensure SUBDOMAIN_ADDRESS is properly set
+            DOMAIN_ADDRESS="${{ env.DOMAIN_ADDRESS }}"  # Ensure DOMAIN_ADDRESS is properly set
+            SUBDOMAIN_ADDRESS="${{ env.SUBDOMAIN_ADDRESS }}"  # Ensure SUBDOMAIN_ADDRESS is properly set
             # Remove existing NGINX config file
             sudo rm /etc/nginx/sites-available/$DOMAIN_ADDRESS
             sudo rm /etc/nginx/sites-enabled/$DOMAIN_ADDRESS
