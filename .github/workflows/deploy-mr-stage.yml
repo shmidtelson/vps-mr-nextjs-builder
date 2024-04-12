@@ -24,44 +24,44 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-#      - name: Cache node modules
-#        uses: actions/cache@v2
-#        with:
-#          path: ~/.npm
-#          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
-#          restore-keys: |
-#            ${{ runner.os }}-node-
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-#      - name: Install Node.js
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: '18'
-#
-#      - name: Install dependencies and build
-#        run: |
-#          npm install
-#          npm run build
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
 
-#      - name: Copy project files to VPS
-#        uses: appleboy/scp-action@master
-#        with:
-#          host: ${{ secrets.VPS_HOST }}
-#          username: ${{ secrets.VPS_USERNAME }}
-#          key: ${{ secrets.SSH_PRIVATE_KEY }}
-#          port: ${{ secrets.SSH_PORT }} # Optional, default is 22
-#          source: "." # Source directory or file path
-#          target: "/home/frontend/${{ github.sha }}" # Dynamic subdomain directory on VPS
-#
-#      - name: SSH to VPS and Start Next.js app with PM2
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.VPS_HOST }}
-#          username: ${{ secrets.VPS_USERNAME }}
-#          key: ${{ secrets.SSH_PRIVATE_KEY }}
-#          port: ${{ secrets.SSH_PORT }}
-#          script: |
-#            cd /home/frontend/${{ github.sha }}
-#            ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.sha }}' -- start -- --port ${{ env.PORT_NUMBER }}
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+
+      - name: Copy project files to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }} # Optional, default is 22
+          source: "." # Source directory or file path
+          target: "/home/frontend/${{ github.sha }}" # Dynamic subdomain directory on VPS
+
+      - name: SSH to VPS and Start Next.js app with PM2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /home/frontend/${{ github.sha }}
+            ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.sha }}' -- start -- --port ${{ env.PORT_NUMBER }}
 
       - name: Configure Nginx on VPS
         uses: appleboy/ssh-action@master
