@@ -81,7 +81,7 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
-          command: |
+          script: |
             # Remove existing NGINX config file
             sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}
             sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}
