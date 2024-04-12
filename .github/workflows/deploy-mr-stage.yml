@@ -9,18 +9,6 @@ on:
       - completed
 
 jobs:
-  set_env:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set Domain Secret
-        run: echo "DOMAIN_ADDRESS=${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
-      - name: Set Subdomain
-        run: echo "SUBDOMAIN=$GITHUB_SHA.${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
-      - name: Set URL
-        run: echo "URL=https://$SUBDOMAIN" >> $GITHUB_ENV
-      - name: Output URL
-        run: echo "URL is $URL"
-
   deploy:
     runs-on: ubuntu-latest
     needs: [set_env]
@@ -28,9 +16,11 @@ jobs:
       PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
       NPM: /root/.nvm/versions/node/v18.20.2/bin/npm
       PORT_NUMBER: $((10000 + RANDOM % 10001))
+      DOMAIN_ADDRESS: web7.pro
+      SUBDOMAIN_ADDRESS: $GITHUB_SHA.${{ env.DOMAIN_ADDRESS }}
     environment:
       name: 'stage'
-      url: ${{ env.URL }}
+      url: https://$DOMAIN_ADDRESS
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -83,12 +73,12 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             # Remove existing NGINX config file
-            sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}
-            sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}
-            cat << EOF | sudo tee /etc/nginx/sites-available/${{ env.SUBDOMAIN }}
+            sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN_ADDRESS }}
+            sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN_ADDRESS }}
+            cat << EOF | sudo tee /etc/nginx/sites-available/${{ env.SUBDOMAIN_ADDRESS }}
             server {
               listen 443 ssl;
-              server_name ${{ env.SUBDOMAIN }};
+              server_name ${{ env.SUBDOMAIN_ADDRESS }};
               ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
               ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
               location / {
@@ -101,5 +91,5 @@ jobs:
               }
             }
             EOF
-            sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
+            sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN_ADDRESS }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN_ADDRESS }}"
             sudo nginx -t && sudo systemctl restart nginx
