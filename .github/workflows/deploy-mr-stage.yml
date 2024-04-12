@@ -92,12 +92,12 @@ jobs:
               ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
               ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
               location / {
-              proxy_pass http://localhost:${{ env.PORT_NUMBER }}; # Adjust this to match the port provided by PM2
-              proxy_http_version 1.1;
-              proxy_set_header Upgrade $http_upgrade;
-              proxy_set_header Connection 'upgrade';
-              proxy_set_header Host $host;
-              proxy_cache_bypass $http_upgrade;
+                proxy_pass http://localhost:${{ env.PORT_NUMBER }}; # Adjust this to match the port provided by PM2
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host $host;
+                proxy_cache_bypass $http_upgrade;
               }
             }
             EOF
