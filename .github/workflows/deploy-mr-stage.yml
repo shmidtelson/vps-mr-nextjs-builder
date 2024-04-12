@@ -12,6 +12,14 @@ env:
   PORT_NUMBER: $((10000 + RANDOM % 10001))
 
 jobs:
+  set_port_number:
+    runs-on: ubuntu-latest
+    env:
+      PORT_NUMBER: $((10000 + RANDOM % 10001))
+    steps:
+      - name: Set Port Number
+        run: echo "PORT_NUMBER=$PORT_NUMBER" >> $GITHUB_ENV
+
   deploy:
     runs-on: ubuntu-latest
     env:
@@ -25,6 +33,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Set env
+        run: echo "PORT_NUMBER=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
 
       - name: Cache node modules
         uses: actions/cache@v2
