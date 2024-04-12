@@ -44,10 +44,8 @@ jobs:
           echo "The run id is: $GITHUB_RUN_ID"
           echo "The GitHub Actor's username is: $GITHUB_ACTOR"
           echo "GitHub SHA: $GITHUB_SHA"
-      - name: Set Head Ref
-        run: echo "HEAD_REF_NEW=$(echo $GITHUB_HEAD_REF | tr '/' '-')" >> $GITHUB_ENV
       - name: Set Subdomain
-        run: echo "SUBDOMAIN=${{ github.event.number }}-${{ env.HEAD_REF_NEW }}" >> $GITHUB_ENV
+        run: echo "SUBDOMAIN=${{ github.event.number }}-${{ github.sha }}" >> $GITHUB_ENV
 
   deploy:
     runs-on: ubuntu-latest
@@ -57,7 +55,7 @@ jobs:
       PORT_NUMBER: $((10000 + RANDOM % 10001))
     environment:
       name: 'stage'
-#      url: "https://${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
+      url: "https://${{ env.SUBDOMAIN }}.${{ secrets.DOMAIN_ADDRESS }}"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
