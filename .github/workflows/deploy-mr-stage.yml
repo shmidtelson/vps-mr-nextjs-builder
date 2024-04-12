@@ -35,19 +35,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Save ssh key
+      - name: Save SSH key
         run: |
-          echo "$SSH_PRIVATE_KEY" > /tmp/ssh_key.pem
-          chmod 600 /tmp/ssh_key.pem
-          cat /tmp/ssh_key.pem
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /root/.ssh/id_ed25519
+          chmod 600 /root/.ssh/id_ed25519
 
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
-          restore-keys: |
-            ${{ runner.os }}-node-
+#      - name: Cache node modules
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.npm
+#          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
+#          restore-keys: |
+#            ${{ runner.os }}-node-
 
 #      - name: Install Node.js
 #        uses: actions/setup-node@v2
@@ -82,10 +81,9 @@ jobs:
 
       - name: Configure Nginx on VPS
         run: |
-          cat /tmp/ssh_key.pem
           # Remove existing NGINX config file
-          ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}"
-          ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}"
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
           # Create new NGINX config file
           cat << EOF | sudo tee /etc/nginx/sites-available/${{ env.SUBDOMAIN }}
           server {
@@ -104,6 +102,6 @@ jobs:
           }
           EOF
           # Enable NGINX config
-          ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
           # Restart NGINX
-          ssh -i /tmp/ssh_key.pem ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
