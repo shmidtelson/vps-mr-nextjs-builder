@@ -14,13 +14,15 @@ jobs:
     steps:
       - name: Set Domain Secret
         run: echo "DOMAIN_ADDRESS=${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
+      - name: Set Head Ref
+        run: echo "HEAD_REF=$(echo ${{ github.head_ref }} | tr '/' '-')" >> $GITHUB_ENV
 
   deploy:
     runs-on: ubuntu-latest
     env:
-      SUBDOMAIN: ${{ github.event.number }}-${{ github.head_ref.replace('/', '-') }}
+      SUBDOMAIN: '${{ github.event.number }}-${{ env.HEAD_REF }}'
       PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
-      PORT_NUMBER: $((10000 + RANDOM % 10001))
+      PORT_NUMBER: $((10000 + RANDOM % 10001))K
     environment:
       name: 'stage'
       url: "https://${{ env.SUBDOMAIN }}.${{ env.DOMAIN_ADDRESS }}"
