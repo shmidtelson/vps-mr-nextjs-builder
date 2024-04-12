@@ -15,7 +15,7 @@ jobs:
       SUBDOMAIN: "${{ github.event.number }}-${{ github.head_ref }}"
       PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
       DOMAIN_ADDRESS: web7.pro
-      SUBDOMAIN_ADDRESS: ${{ github.sha }}.web7.pro
+      SUBDOMAIN_ADDRESS: stage-${{ github.event.number }}.web7.pro
     steps:
       - name: Configure Nginx on VPS
         uses: appleboy/ssh-action@master

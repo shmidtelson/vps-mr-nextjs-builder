@@ -16,7 +16,7 @@ jobs:
       NPM: /root/.nvm/versions/node/v18.20.2/bin/npm
       PORT_NUMBER: $((10000 + RANDOM % 10001))
       DOMAIN_ADDRESS: web7.pro
-      SUBDOMAIN_ADDRESS: ${{ github.sha }}.web7.pro
+      SUBDOMAIN_ADDRESS: stage-${{ github.event.number }}.web7.pro
     environment:
       name: 'stage'
       url: https://${{ env.SUBDOMAIN_ADDRESS }}
@@ -61,7 +61,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/frontend/${{ github.sha }}
-            ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.sha }}' -- start -- --port ${{ env.PORT_NUMBER }}
+            ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.event.number }}' -- start -- --port ${{ env.PORT_NUMBER }}
 
       - name: Configure Nginx on VPS
         uses: appleboy/ssh-action@master
