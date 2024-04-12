@@ -62,6 +62,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/frontend/${{ env.SUBDOMAIN_ADDRESS }}
+            ${{ env.PATH_PM2 }} delete stage-nextjs-app-${{ github.event.number }}
             ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.event.number }}' -- start -- --port ${{ env.PORT_NUMBER }}
 
       - name: Configure Nginx on VPS
