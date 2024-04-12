@@ -59,7 +59,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            source ~/.bashrc
             cd /home/frontend/${{ env.SUBDOMAIN_ADDRESS }}
             pm2 delete stage-nextjs-app-${{ github.event.number }}
             pm2 start npm --name 'stage-nextjs-app-${{ github.event.number }}' -- start -- --port ${{ env.PORT_NUMBER }}

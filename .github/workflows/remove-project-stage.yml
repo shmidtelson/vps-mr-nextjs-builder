@@ -25,7 +25,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            source ~/.bashrc
             sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN_ADDRESS }}
             sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN_ADDRESS }}
             sudo systemctl restart nginx
