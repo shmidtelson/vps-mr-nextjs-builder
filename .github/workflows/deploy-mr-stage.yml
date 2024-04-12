@@ -71,15 +71,13 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            DOMAIN_ADDRESS="${{ env.DOMAIN_ADDRESS }}"  # Ensure DOMAIN_ADDRESS is properly set
-            SUBDOMAIN_ADDRESS="${{ env.SUBDOMAIN_ADDRESS }}"  # Ensure SUBDOMAIN_ADDRESS is properly set
             # Remove existing NGINX config file
-            sudo rm /etc/nginx/sites-available/$DOMAIN_ADDRESS
-            sudo rm /etc/nginx/sites-enabled/$DOMAIN_ADDRESS
-            cat << EOF | sudo tee /etc/nginx/sites-available/$DOMAIN_ADDRESS
+            sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN_ADDRESS }}
+            sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN_ADDRESS }}
+            cat << EOF | sudo tee /etc/nginx/sites-available/${{ env.SUBDOMAIN_ADDRESS }}
             server {
               listen 443 ssl;
-              server_name $DOMAIN_ADDRESS;
+              server_name ${{ env.SUBDOMAIN_ADDRESS }};
               ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
               ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
               location / {
@@ -92,5 +90,5 @@ jobs:
               }
             }
             EOF
-            sudo ln -s /etc/nginx/sites-available/$DOMAIN_ADDRESS /etc/nginx/sites-enabled/$DOMAIN_ADDRESS
+            sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN_ADDRESS }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN_ADDRESS }}
             sudo nginx -t && sudo systemctl restart nginx
