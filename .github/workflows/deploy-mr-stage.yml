@@ -83,16 +83,16 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             # Remove existing NGINX config file
-            sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}
-            sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}
-            cat << EOF | sudo tee /etc/nginx/sites-available/${{ env.SUBDOMAIN }}
+            sudo rm /etc/nginx/sites-available/$DOMAIN_ADDRESS
+            sudo rm /etc/nginx/sites-enabled/$DOMAIN_ADDRESS
+            cat << EOF | sudo tee /etc/nginx/sites-available/$DOMAIN_ADDRESS
             server {
               listen 443 ssl;
-              server_name ${{ env.SUBDOMAIN }};
+              server_name $DOMAIN_ADDRESS;
               ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
               ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
               location / {
-                proxy_pass http://localhost:${{ env.PORT_NUMBER }}; # Adjust this to match the port provided by PM2
+                proxy_pass http://localhost:$DOMAIN_ADDRESS; # Adjust this to match the port provided by PM2
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection 'upgrade';
@@ -101,6 +101,6 @@ jobs:
               }
             }
             EOF
-            sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
+            sudo ln -s /etc/nginx/sites-available/$DOMAIN_ADDRESS /etc/nginx/sites-enabled/$DOMAIN_ADDRESS"
             sudo nginx -t && sudo systemctl restart nginx
   
