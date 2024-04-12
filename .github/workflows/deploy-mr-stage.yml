@@ -28,7 +28,6 @@ jobs:
       PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
       NPM: /root/.nvm/versions/node/v18.20.2/bin/npm
       PORT_NUMBER: $((10000 + RANDOM % 10001))
-      SUBDOMAIN: $SUBDOMAIN
     environment:
       name: 'stage'
       url: ${{ env.URL }}
@@ -77,6 +76,7 @@ jobs:
 
       - name: Configure Nginx on VPS
         run: |
+          echo toJson(env)
           # Remove existing NGINX config file
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}"
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
