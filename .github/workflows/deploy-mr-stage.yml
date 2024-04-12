@@ -75,10 +75,12 @@ jobs:
 #            ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.sha }}' -- start -- --port ${{ env.PORT_NUMBER }}
 
       - name: Configure Nginx on VPS
-        uses: JimCronqvist/action-ssh@master
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          hosts: '${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}'
-          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
           command: |
             # Remove existing NGINX config file
             sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}
