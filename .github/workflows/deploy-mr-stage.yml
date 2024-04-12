@@ -8,9 +8,6 @@ on:
     types:
       - completed
 
-env:
-  PORT_NUMBER: $((10000 + RANDOM % 10001))
-
 jobs:
   set_port_number:
     runs-on: ubuntu-latest
