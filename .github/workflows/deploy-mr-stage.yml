@@ -19,7 +19,7 @@ jobs:
       SUBDOMAIN_ADDRESS: ${{ github.sha }}.web7.pro
     environment:
       name: 'stage'
-      url: https://$DOMAIN_ADDRESS
+      url: https://${{ env.SUBDOMAIN_ADDRESS }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
