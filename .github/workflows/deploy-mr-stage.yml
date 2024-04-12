@@ -37,8 +37,8 @@ jobs:
 
       - name: Save SSH key
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /root/.ssh/id_ed25519
-          chmod 600 /root/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/id_ed25519
+          chmod 600 $HOME/.ssh/id_ed25519
 
 #      - name: Cache node modules
 #        uses: actions/cache@v2
