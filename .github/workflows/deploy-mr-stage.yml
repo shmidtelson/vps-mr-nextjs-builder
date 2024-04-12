@@ -60,7 +60,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /home/frontend/${{ github.sha }}
+            cd /home/frontend/${{ env.SUBDOMAIN_ADDRESS }}
             ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.event.number }}' -- start -- --port ${{ env.PORT_NUMBER }}
 
       - name: Configure Nginx on VPS
