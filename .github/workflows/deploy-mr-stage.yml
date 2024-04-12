@@ -8,13 +8,15 @@ on:
     types:
       - completed
 
+env:
+  PORT_NUMBER: $((10000 + RANDOM % 10001))
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
       PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
       NPM: /root/.nvm/versions/node/v18.20.2/bin/npm
-      PORT_NUMBER: $((10000 + RANDOM % 10001))
       DOMAIN_ADDRESS: web7.pro
       SUBDOMAIN_ADDRESS: stage-${{ github.event.number }}.web7.pro
     environment:
@@ -61,7 +63,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/frontend/${{ env.SUBDOMAIN_ADDRESS }}
-            ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.event.number }}' -- start -- --port ${{ env.PORT_NUMBER }}
+            ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.event.number }}' -- start -- --port $PORT_NUMBER
 
       - name: Configure Nginx on VPS
         uses: appleboy/ssh-action@master
@@ -81,7 +83,7 @@ jobs:
               ssl_certificate /etc/ssl/certs/server.pem;
               ssl_certificate_key /etc/ssl/private/server.key;
               location / {
-                proxy_pass http://localhost:${{ env.PORT_NUMBER }}; # Adjust this to match the port provided by PM2
+                proxy_pass http://localhost:$PORT_NUMBER; # Adjust this to match the port provided by PM2
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade \$http_upgrade;
                 proxy_set_header Connection 'upgrade';
