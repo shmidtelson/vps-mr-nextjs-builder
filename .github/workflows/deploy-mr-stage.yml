@@ -1,4 +1,4 @@
-name: PR Deployment
+name: PR Deployment to VPS
 
 on:
   pull_request:
