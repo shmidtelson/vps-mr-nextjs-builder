@@ -28,6 +28,7 @@ jobs:
       PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
       NPM: /root/.nvm/versions/node/v18.20.2/bin/npm
       PORT_NUMBER: $((10000 + RANDOM % 10001))
+      SUBDOMAIN: ${{ env.SUBDOMAIN }}
     environment:
       name: 'stage'
       url: ${{ env.URL }}
