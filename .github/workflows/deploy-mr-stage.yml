@@ -3,10 +3,6 @@ name: PR Deployment to VPS
 on:
   pull_request:
     types: [ opened, synchronize ] # Trigger on PR open, sync, and close
-  workflow_run:
-    workflows: ["Remove deploy", "Deploy"]
-    types:
-      - completed
 
 jobs:
   set_env:
