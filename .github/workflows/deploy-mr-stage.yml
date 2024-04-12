@@ -83,8 +83,8 @@ jobs:
       - name: Configure Nginx on VPS
         run: |
           # Remove existing NGINX config file
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}"
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
+          ssh -i $HOME/.ssh/id_ed25519 ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-available/${{ env.SUBDOMAIN }}"
+          ssh -i $HOME/.ssh/id_ed25519 ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo rm /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
           # Create new NGINX config file
           cat << EOF | sudo tee /etc/nginx/sites-available/${{ env.SUBDOMAIN }}
           server {
@@ -103,6 +103,6 @@ jobs:
           }
           EOF
           # Enable NGINX config
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
+          ssh -i $HOME/.ssh/id_ed25519 ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo ln -s /etc/nginx/sites-available/${{ env.SUBDOMAIN }} /etc/nginx/sites-enabled/${{ env.SUBDOMAIN }}"
           # Restart NGINX
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
+          ssh -i $HOME/.ssh/id_ed25519 ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} -p ${{ secrets.SSH_PORT }} "sudo nginx -t && sudo systemctl restart nginx"
