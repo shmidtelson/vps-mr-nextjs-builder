@@ -12,8 +12,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      PATH_PM2: /root/.nvm/versions/node/v18.20.2/bin/pm2
-      NPM: /root/.nvm/versions/node/v18.20.2/bin/npm
       DOMAIN_ADDRESS: web7.pro
       SUBDOMAIN_ADDRESS: stage-${{ github.event.number }}.web7.pro
     environment:
@@ -61,9 +59,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            source ~/.bashrc
             cd /home/frontend/${{ env.SUBDOMAIN_ADDRESS }}
-            ${{ env.PATH_PM2 }} delete stage-nextjs-app-${{ github.event.number }}
-            ${{ env.PATH_PM2 }} start ${{ env.NPM }} --name 'stage-nextjs-app-${{ github.event.number }}' -- start -- --port ${{ env.PORT_NUMBER }}
+            pm2 delete stage-nextjs-app-${{ github.event.number }}
+            pm2 start npm --name 'stage-nextjs-app-${{ github.event.number }}' -- start -- --port ${{ env.PORT_NUMBER }}
 
       - name: Configure Nginx on VPS
         uses: appleboy/ssh-action@master
