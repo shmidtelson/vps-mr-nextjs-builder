@@ -9,6 +9,17 @@ on:
       - completed
 
 jobs:
+  set_env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Domain Secret
+        run: echo "DOMAIN_ADDRESS=${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
+      - name: Set URL
+        run: echo "URL=https://$GITHUB_SHA.${{ secrets.DOMAIN_ADDRESS }}" >> $GITHUB_ENV
+      - name: Set Environment
+        run: echo "ENVIRONMENT_URL=$URL" >> $GITHUB_ENV
+      - name: Output URL
+        run: echo "URL is $URL"
   deploy:
     runs-on: ubuntu-latest
     needs: [set_env]
@@ -17,7 +28,7 @@ jobs:
       PORT_NUMBER: $((10000 + RANDOM % 10001))
     environment:
       name: 'stage'
-      url: https://${{ github.sha }}.${{ secrets.DOMAIN_ADDRESS }}
+      url: ${{ env.ENVIRONMENT_URL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
